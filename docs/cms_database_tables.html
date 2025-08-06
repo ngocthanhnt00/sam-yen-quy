@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS Database Tables</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .table-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: #4CAF50;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .table-container {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .table-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .table-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .record-count {
+            background: #3498db;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #e3f2fd;
+            transition: background-color 0.3s ease;
+        }
+
+        .uuid {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #666;
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .status {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status.active, .status.published, .status.approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.inactive, .status.draft, .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.banned, .status.trash, .status.spam {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .timestamp {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .content-preview {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 20px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1em;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            table {
+                font-size: 0.85em;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+            }
+            
+            .table-nav {
+                flex-direction: column;
+            }
+            
+            .nav-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗄️ WordPress-Inspired Modern CMS</h1>
+            <p>Cấu trúc cơ sở dữ liệu hiện đại với UUID và đa ngôn ngữ</p>
+        </div>
+
+        <input type="text" class="search-box" placeholder="🔍 Tìm kiếm trong các bảng..." id="searchBox">
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">15</div>
+                <div class="stat-label">Bảng dữ liệu</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">127</div>
+                <div class="stat-label">Tổng bản ghi</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Ngôn ngữ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">8</div>
+                <div class="stat-label">Loại nội dung</div>
+            </div>
+        </div>
+
+        <div class="table-nav">
+            <button class="nav-btn active" onclick="showTable('users')">👥 Users</button>
+            <button class="nav-btn" onclick="showTable('posts')">📝 Posts</button>
+            <button class="nav-btn" onclick="showTable('terms')">🏷️ Terms</button>
+            <button class="nav-btn" onclick="showTable('comments')">💬 Comments</button>
+            <button class="nav-btn" onclick="showTable('options')">⚙️ Options</button>
+            <button class="nav-btn" onclick="showTable('languages')">🌐 Languages</button>
+            <button class="nav-btn" onclick="showTable('user_meta')">👤 User Meta</button>
+            <button class="nav-btn" onclick="showTable('post_meta')">📄 Post Meta</button>
+            <button class="nav-btn" onclick="showTable('term_taxonomy')">📊 Term Taxonomy</button>
+            <button class="nav-btn" onclick="showTable('term_relationships')">🔗 Term Relations</button>
+            <button class="nav-btn" onclick="showTable('term_meta')">🏷️ Term Meta</button>
+            <button class="nav-btn" onclick="showTable('comment_meta')">💭 Comment Meta</button>
+            <button class="nav-btn" onclick="showTable('post_translations')">🌍 Translations</button>
+            <button class="nav-btn" onclick="showTable('activity_logs')">📊 Activity Logs</button>
+        </div>
+
+        <!-- Users Table -->
+        <div id="users" class="table-container active">
+            <div class="table-header">
+                <h2 class="table-title">👥 Users Table</h2>
+                <span class="record-count">5 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Display Name</th>
+                        <th>Status</th>
+                        <th>Email Verified</th>
+                        <th>Last Login</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">e5f6g7h8-i9j0</span></td>
+                        <td><span class="uuid">tt4a5x6o-n7o8</span></td>
+                        <td>0</td>
+                        <td class="timestamp">2024-05-13 10:15:45</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">d4e5f6g7-h8i9</span></td>
+                        <td><span class="uuid">tt5a6x7o-n8o9</span></td>
+                        <td>1</td>
+                        <td class="timestamp">2024-04-06 16:45:22</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Term Meta Table -->
+        <div id="term_meta" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">🏷️ Term Meta Table</h2>
+                <span class="record-count">9 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Term ID</th>
+                        <th>Meta Key</th>
+                        <th>Meta Value</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">tm1e2t3a-4t5e</span></td>
+                        <td><span class="uuid">t1e2r3m4-s5a6</span></td>
+                        <td>color</td>
+                        <td>#3498db</td>
+                        <td class="timestamp">2024-01-16 11:30:00</td>
+                        <td class="timestamp">2024-01-16 11:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tm2e3t4a-5t6e</span></td>
+                        <td><span class="uuid">t1e2r3m4-s5a6</span></td>
+                        <td>icon</td>
+                        <td>fas fa-microchip</td>
+                        <td class="timestamp">2024-01-16 11:30:00</td>
+                        <td class="timestamp">2024-01-16 11:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tm3e4t5a-6t7e</span></td>
+                        <td><span class="uuid">t2e3r4m5-s6a7</span></td>
+                        <td>color</td>
+                        <td>#e74c3c</td>
+                        <td class="timestamp">2024-01-16 11:35:00</td>
+                        <td class="timestamp">2024-01-16 11:35:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tm4e5t6a-7t8e</span></td>
+                        <td><span class="uuid">t2e3r4m5-s6a7</span></td>
+                        <td>featured</td>
+                        <td>true</td>
+                        <td class="timestamp">2024-01-16 11:35:00</td>
+                        <td class="timestamp">2024-06-15 10:20:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tm5e6t7a-8t9e</span></td>
+                        <td><span class="uuid">t3e4r5m6-s7a8</span></td>
+                        <td>difficulty_level</td>
+                        <td>all</td>
+                        <td class="timestamp">2024-02-21 10:00:00</td>
+                        <td class="timestamp">2024-02-21 10:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tm6e7t8a-9t0e</span></td>
+                        <td><span class="uuid">t4e5r6m7-s8a9</span></td>
+                        <td>display_order</td>
+                        <td>1</td>
+                        <td class="timestamp">2024-03-11 15:00:00</td>
+                        <td class="timestamp">2024-03-11 15:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tm7e8t9a-0t1e</span></td>
+                        <td><span class="uuid">t4e5r6m7-s8a9</span></td>
+                        <td>show_in_menu</td>
+                        <td>true</td>
+                        <td class="timestamp">2024-03-11 15:00:00</td>
+                        <td class="timestamp">2024-03-11 15:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tm8e9t0a-1t2e</span></td>
+                        <td><span class="uuid">t5e6r7m8-s9a0</span></td>
+                        <td>related_url</td>
+                        <td>https://wordpress.org</td>
+                        <td class="timestamp">2024-04-06 17:00:00</td>
+                        <td class="timestamp">2024-04-06 17:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tm9e0t1a-2t3e</span></td>
+                        <td><span class="uuid">t6e7r8m9-s0a1</span></td>
+                        <td>trending</td>
+                        <td>true</td>
+                        <td class="timestamp">2024-05-13 11:00:00</td>
+                        <td class="timestamp">2024-07-30 14:45:15</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Comment Meta Table -->
+        <div id="comment_meta" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">💭 Comment Meta Table</h2>
+                <span class="record-count">5 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Comment ID</th>
+                        <th>Meta Key</th>
+                        <th>Meta Value</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">cm1e2t3a-4c5o</span></td>
+                        <td><span class="uuid">c1o2m3m4-e5n6</span></td>
+                        <td>rating</td>
+                        <td>5</td>
+                        <td class="timestamp">2024-01-17 09:15:30</td>
+                        <td class="timestamp">2024-01-17 09:15:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">cm2e3t4a-5c6o</span></td>
+                        <td><span class="uuid">c2o3m4m5-e6n7</span></td>
+                        <td>helpful_count</td>
+                        <td>12</td>
+                        <td class="timestamp">2024-01-18 14:22:45</td>
+                        <td class="timestamp">2024-07-20 16:30:22</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">cm3e4t5a-6c7o</span></td>
+                        <td><span class="uuid">c4o5m6m7-e8n9</span></td>
+                        <td>rating</td>
+                        <td>4</td>
+                        <td class="timestamp">2024-02-22 10:45:33</td>
+                        <td class="timestamp">2024-02-22 10:45:33</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">cm4e5t6a-7c8o</span></td>
+                        <td><span class="uuid">c5o6m7m8-e9n0</span></td>
+                        <td>verified_purchase</td>
+                        <td>false</td>
+                        <td class="timestamp">2024-02-23 13:20:15</td>
+                        <td class="timestamp">2024-02-23 13:20:15</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">cm5e6t7a-8c9o</span></td>
+                        <td><span class="uuid">c7o8m9m0-e1n2</span></td>
+                        <td>spam_score</td>
+                        <td>0.95</td>
+                        <td class="timestamp">2024-05-14 20:30:44</td>
+                        <td class="timestamp">2024-05-14 20:30:44</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Post Translations Table -->
+        <div id="post_translations" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">🌍 Post Translations Table</h2>
+                <span class="record-count">6 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Post ID</th>
+                        <th>Language ID</th>
+                        <th>Translation ID</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">pt1r2a3n-s4l5</span></td>
+                        <td><span class="uuid">a1b2c3d4-e5f6</span></td>
+                        <td><span class="uuid">l1a2n3g4-u5a6</span></td>
+                        <td>-</td>
+                        <td class="timestamp">2024-01-16 11:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pt2r3a4n-s5l6</span></td>
+                        <td><span class="uuid">i1j2k3l4-m5n6</span></td>
+                        <td><span class="uuid">l2a3n4g5-u6a7</span></td>
+                        <td><span class="uuid">a1b2c3d4-e5f6</span></td>
+                        <td class="timestamp">2024-01-20 14:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pt3r4a5n-s6l7</span></td>
+                        <td><span class="uuid">b2c3d4e5-f6g7</span></td>
+                        <td><span class="uuid">l1a2n3g4-u5a6</span></td>
+                        <td>-</td>
+                        <td class="timestamp">2024-02-21 09:30:15</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pt4r5a6n-s7l8</span></td>
+                        <td><span class="uuid">j2k3l4m5-n6o7</span></td>
+                        <td><span class="uuid">l2a3n4g5-u6a7</span></td>
+                        <td><span class="uuid">b2c3d4e5-f6g7</span></td>
+                        <td class="timestamp">2024-02-25 16:45:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pt5r6a7n-s8l9</span></td>
+                        <td><span class="uuid">c3d4e5f6-g7h8</span></td>
+                        <td><span class="uuid">l1a2n3g4-u5a6</span></td>
+                        <td>-</td>
+                        <td class="timestamp">2024-03-11 14:20:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pt6r7a8n-s9l0</span></td>
+                        <td><span class="uuid">k3l4m5n6-o7p8</span></td>
+                        <td><span class="uuid">l3a4n5g6-u7a8</span></td>
+                        <td><span class="uuid">c3d4e5f6-g7h8</span></td>
+                        <td class="timestamp">2024-03-15 10:15:45</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Activity Logs Table -->
+        <div id="activity_logs" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">📊 Activity Logs Table</h2>
+                <span class="record-count">12 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User ID</th>
+                        <th>Object Type</th>
+                        <th>Object ID</th>
+                        <th>Action</th>
+                        <th>Description</th>
+                        <th>IP Address</th>
+                        <th>Metadata</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">al1o2g3s-4a5c</span></td>
+                        <td><span class="uuid">550e8400-e29b</span></td>
+                        <td>user</td>
+                        <td><span class="uuid">550e8400-e29b</span></td>
+                        <td>login</td>
+                        <td>User logged in successfully</td>
+                        <td>192.168.1.100</td>
+                        <td class="content-preview">{"browser": "Chrome 127", "os": "Windows 10"}</td>
+                        <td class="timestamp">2025-08-05 09:15:23</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">al2o3g4s-5a6c</span></td>
+                        <td><span class="uuid">6ba7b810-9dad</span></td>
+                        <td>post</td>
+                        <td><span class="uuid">a1b2c3d4-e5f6</span></td>
+                        <td>update</td>
+                        <td>Post content updated</td>
+                        <td>10.0.0.50</td>
+                        <td class="content-preview">{"changes": ["content", "excerpt"]}</td>
+                        <td class="timestamp">2025-08-04 16:22:10</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">al3o4g5s-6a7c</span></td>
+                        <td><span class="uuid">6ba7b812-9dad</span></td>
+                        <td>post</td>
+                        <td><span class="uuid">d4e5f6g7-h8i9</span></td>
+                        <td>create</td>
+                        <td>New draft post created</td>
+                        <td>172.16.0.25</td>
+                        <td class="content-preview">{"post_type": "post", "status": "draft"}</td>
+                        <td class="timestamp">2024-04-06 16:45:22</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">al4o5g6s-7a8c</span></td>
+                        <td><span class="uuid">6ba7b811-9dad</span></td>
+                        <td>comment</td>
+                        <td><span class="uuid">c1o2m3m4-e5n6</span></td>
+                        <td>approve</td>
+                        <td>Comment approved by moderator</td>
+                        <td>192.168.1.75</td>
+                        <td class="content-preview">{"previous_status": "pending"}</td>
+                        <td class="timestamp">2024-01-17 10:30:15</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">al5o6g7s-8a9c</span></td>
+                        <td><span class="uuid">550e8400-e29b</span></td>
+                        <td>user</td>
+                        <td><span class="uuid">6ba7b813-9dad</span></td>
+                        <td>ban</td>
+                        <td>User account suspended for policy violations</td>
+                        <td>192.168.1.100</td>
+                        <td class="content-preview">{"reason": "spam", "duration": "permanent"}</td>
+                        <td class="timestamp">2024-07-20 15:45:22</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">al6o7g8s-9a0c</span></td>
+                        <td><span class="uuid">6ba7b810-9dad</span></td>
+                        <td>post</td>
+                        <td><span class="uuid">e5f6g7h8-i9j0</span></td>
+                        <td>publish</td>
+                        <td>Product post published</td>
+                        <td>10.0.0.50</td>
+                        <td class="content-preview">{"post_type": "product", "price": 1500000}</td>
+                        <td class="timestamp">2024-05-13 10:15:45</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">al7o8g9s-0a1c</span></td>
+                        <td><span class="uuid">6ba7b811-9dad</span></td>
+                        <td>attachment</td>
+                        <td><span class="uuid">f6g7h8i9-j0k1</span></td>
+                        <td>upload</td>
+                        <td>New image uploaded</td>
+                        <td>192.168.1.75</td>
+                        <td class="content-preview">{"file_size": 2048576, "mime_type": "image/jpeg"}</td>
+                        <td class="timestamp">2024-06-20 13:30:12</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">al8o9g0s-1a2c</span></td>
+                        <td><span class="uuid">6ba7b812-9dad</span></td>
+                        <td>option</td>
+                        <td><span class="uuid">o8p9t0i1-o2n3</span></td>
+                        <td>update</td>
+                        <td>Theme settings updated</td>
+                        <td>172.16.0.25</td>
+                        <td class="content-preview">{"option_name": "theme_settings"}</td>
+                        <td class="timestamp">2024-07-15 09:45:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">al9o0g1s-2a3c</span></td>
+                        <td>-</td>
+                        <td>comment</td>
+                        <td><span class="uuid">c7o8m9m0-e1n2</span></td>
+                        <td>spam_detect</td>
+                        <td>Comment automatically marked as spam</td>
+                        <td>203.0.113.42</td>
+                        <td class="content-preview">{"spam_score": 0.95, "triggers": ["suspicious_links"]}</td>
+                        <td class="timestamp">2024-05-14 20:30:44</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">al0o1g2s-3a4c</span></td>
+                        <td><span class="uuid">6ba7b810-9dad</span></td>
+                        <td>user</td>
+                        <td><span class="uuid">6ba7b810-9dad</span></td>
+                        <td>profile_update</td>
+                        <td>User profile information updated</td>
+                        <td>10.0.0.50</td>
+                        <td class="content-preview">{"fields": ["bio", "avatar_url"]}</td>
+                        <td class="timestamp">2024-05-15 16:30:45</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">alo2g3s4-a5c6</span></td>
+                        <td><span class="uuid">6ba7b811-9dad</span></td>
+                        <td>post</td>
+                        <td><span class="uuid">g7h8i9j0-k1l2</span></td>
+                        <td>publish</td>
+                        <td>Contact page published</td>
+                        <td>192.168.1.75</td>
+                        <td class="content-preview">{"post_type": "page", "template": "contact"}</td>
+                        <td class="timestamp">2024-07-25 08:45:33</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">alo3g4s5-a6c7</span></td>
+                        <td><span class="uuid">550e8400-e29b</span></td>
+                        <td>system</td>
+                        <td>-</td>
+                        <td>backup</td>
+                        <td>Database backup completed successfully</td>
+                        <td>127.0.0.1</td>
+                        <td class="content-preview">{"backup_size": "45.2MB", "duration": "2.5s"}</td>
+                        <td class="timestamp">2025-08-05 03:00:00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function showTable(tableName) {
+            // Hide all tables
+            const tables = document.querySelectorAll('.table-container');
+            tables.forEach(table => table.classList.remove('active'));
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected table
+            document.getElementById(tableName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Search functionality
+        document.getElementById('searchBox').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const activeTable = document.querySelector('.table-container.active');
+            
+            if (activeTable) {
+                const rows = activeTable.querySelectorAll('tbody tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to table rows
+            const tableRows = document.querySelectorAll('tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                    this.style.transition = 'all 0.2s ease';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>550e8400-e29b</span></td>
+                        <td>admin</td>
+                        <td>admin@example.com</td>
+                        <td>Administrator</td>
+                        <td><span class="status active">active</span></td>
+                        <td class="timestamp">2024-01-15 10:30:00</td>
+                        <td class="timestamp">2025-08-05 09:15:23</td>
+                        <td class="timestamp">2024-01-15 10:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">6ba7b810-9dad</span></td>
+                        <td>nguyen_van_a</td>
+                        <td>nguyenvana@email.com</td>
+                        <td>Nguyễn Văn A</td>
+                        <td><span class="status active">active</span></td>
+                        <td class="timestamp">2024-02-20 14:45:12</td>
+                        <td class="timestamp">2025-08-04 16:22:10</td>
+                        <td class="timestamp">2024-02-20 14:45:12</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">6ba7b811-9dad</span></td>
+                        <td>tran_thi_b</td>
+                        <td>tranthib@email.com</td>
+                        <td>Trần Thị B</td>
+                        <td><span class="status active">active</span></td>
+                        <td class="timestamp">2024-03-10 08:20:05</td>
+                        <td class="timestamp">2025-08-03 11:45:33</td>
+                        <td class="timestamp">2024-03-10 08:20:05</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">6ba7b812-9dad</span></td>
+                        <td>editor_user</td>
+                        <td>editor@example.com</td>
+                        <td>Content Editor</td>
+                        <td><span class="status active">active</span></td>
+                        <td class="timestamp">2024-04-05 12:15:30</td>
+                        <td class="timestamp">2025-08-05 07:30:15</td>
+                        <td class="timestamp">2024-04-05 12:15:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">6ba7b813-9dad</span></td>
+                        <td>suspended_user</td>
+                        <td>suspended@example.com</td>
+                        <td>Suspended User</td>
+                        <td><span class="status banned">banned</span></td>
+                        <td>-</td>
+                        <td class="timestamp">2025-07-15 10:22:44</td>
+                        <td class="timestamp">2024-05-12 16:30:22</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Posts Table -->
+        <div id="posts" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">📝 Posts Table</h2>
+                <span class="record-count">8 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Author</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Title</th>
+                        <th>Content Preview</th>
+                        <th>Slug</th>
+                        <th>Comments</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">a1b2c3d4-e5f6</span></td>
+                        <td>admin</td>
+                        <td>post</td>
+                        <td><span class="status published">published</span></td>
+                        <td>Chào mừng đến với CMS mới</td>
+                        <td class="content-preview">Đây là bài viết đầu tiên trên hệ thống CMS mới của chúng tôi...</td>
+                        <td>chao-mung-den-voi-cms-moi</td>
+                        <td>3</td>
+                        <td class="timestamp">2024-01-16 11:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">b2c3d4e5-f6g7</span></td>
+                        <td>nguyen_van_a</td>
+                        <td>post</td>
+                        <td><span class="status published">published</span></td>
+                        <td>Hướng dẫn sử dụng CMS</td>
+                        <td class="content-preview">Bài viết này sẽ hướng dẫn bạn cách sử dụng các tính năng cơ bản...</td>
+                        <td>huong-dan-su-dung-cms</td>
+                        <td>5</td>
+                        <td class="timestamp">2024-02-21 09:30:15</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">c3d4e5f6-g7h8</span></td>
+                        <td>tran_thi_b</td>
+                        <td>page</td>
+                        <td><span class="status published">published</span></td>
+                        <td>Giới thiệu</td>
+                        <td class="content-preview">Trang giới thiệu về công ty và sứ mệnh của chúng tôi...</td>
+                        <td>gioi-thieu</td>
+                        <td>0</td>
+                        <td class="timestamp">2024-03-11 14:20:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">d4e5f6g7-h8i9</span></td>
+                        <td>editor_user</td>
+                        <td>post</td>
+                        <td><span class="status draft">draft</span></td>
+                        <td>Bài viết đang soạn thảo</td>
+                        <td class="content-preview">Đây là một bài viết đang được soạn thảo...</td>
+                        <td>bai-viet-dang-soan-thao</td>
+                        <td>0</td>
+                        <td class="timestamp">2024-04-06 16:45:22</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">e5f6g7h8-i9j0</span></td>
+                        <td>admin</td>
+                        <td>product</td>
+                        <td><span class="status published">published</span></td>
+                        <td>Sản phẩm A</td>
+                        <td class="content-preview">Mô tả chi tiết về sản phẩm A với các tính năng nổi bật...</td>
+                        <td>san-pham-a</td>
+                        <td>2</td>
+                        <td class="timestamp">2024-05-13 10:15:45</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">f6g7h8i9-j0k1</span></td>
+                        <td>nguyen_van_a</td>
+                        <td>attachment</td>
+                        <td><span class="status published">published</span></td>
+                        <td>banner-homepage.jpg</td>
+                        <td class="content-preview">Ảnh banner cho trang chủ website</td>
+                        <td>banner-homepage-jpg</td>
+                        <td>0</td>
+                        <td class="timestamp">2024-06-20 13:30:12</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">g7h8i9j0-k1l2</span></td>
+                        <td>tran_thi_b</td>
+                        <td>page</td>
+                        <td><span class="status published">published</span></td>
+                        <td>Liên hệ</td>
+                        <td class="content-preview">Thông tin liên hệ và form gửi tin nhắn...</td>
+                        <td>lien-he</td>
+                        <td>1</td>
+                        <td class="timestamp">2024-07-25 08:45:33</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">h8i9j0k1-l2m3</span></td>
+                        <td>editor_user</td>
+                        <td>nav_menu_item</td>
+                        <td><span class="status published">published</span></td>
+                        <td>Menu chính</td>
+                        <td class="content-preview">Item menu navigation cho header website</td>
+                        <td>menu-chinh</td>
+                        <td>0</td>
+                        <td class="timestamp">2024-08-01 12:00:00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Terms Table -->
+        <div id="terms" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">🏷️ Terms Table</h2>
+                <span class="record-count">6 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th>Term Group</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">t1e2r3m4-s5a6</span></td>
+                        <td>Công nghệ</td>
+                        <td>cong-nghe</td>
+                        <td>0</td>
+                        <td class="timestamp">2024-01-16 11:30:00</td>
+                        <td class="timestamp">2024-01-16 11:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">t2e3r4m5-s6a7</span></td>
+                        <td>Tin tức</td>
+                        <td>tin-tuc</td>
+                        <td>0</td>
+                        <td class="timestamp">2024-01-16 11:35:00</td>
+                        <td class="timestamp">2024-01-16 11:35:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">t3e4r5m6-s7a8</span></td>
+                        <td>Hướng dẫn</td>
+                        <td>huong-dan</td>
+                        <td>0</td>
+                        <td class="timestamp">2024-02-21 10:00:00</td>
+                        <td class="timestamp">2024-02-21 10:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">t4e5r6m7-s8a9</span></td>
+                        <td>Sản phẩm</td>
+                        <td>san-pham</td>
+                        <td>0</td>
+                        <td class="timestamp">2024-03-11 15:00:00</td>
+                        <td class="timestamp">2024-03-11 15:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">t5e6r7m8-s9a0</span></td>
+                        <td>WordPress</td>
+                        <td>wordpress</td>
+                        <td>0</td>
+                        <td class="timestamp">2024-04-06 17:00:00</td>
+                        <td class="timestamp">2024-04-06 17:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">t6e7r8m9-s0a1</span></td>
+                        <td>CMS</td>
+                        <td>cms</td>
+                        <td>0</td>
+                        <td class="timestamp">2024-05-13 11:00:00</td>
+                        <td class="timestamp">2024-05-13 11:00:00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Comments Table -->
+        <div id="comments" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">💬 Comments Table</h2>
+                <span class="record-count">7 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Post</th>
+                        <th>Author Name</th>
+                        <th>Author Email</th>
+                        <th>Content Preview</th>
+                        <th>Status</th>
+                        <th>Type</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">c1o2m3m4-e5n6</span></td>
+                        <td>Chào mừng đến với...</td>
+                        <td>Lê Văn C</td>
+                        <td>levanc@email.com</td>
+                        <td class="content-preview">Bài viết rất hay và hữu ích! Cảm ơn tác giả...</td>
+                        <td><span class="status approved">approved</span></td>
+                        <td>comment</td>
+                        <td class="timestamp">2024-01-17 09:15:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">c2o3m4m5-e6n7</span></td>
+                        <td>Chào mừng đến với...</td>
+                        <td>Phạm Thị D</td>
+                        <td>phamthid@email.com</td>
+                        <td class="content-preview">Tôi đã học được nhiều điều từ bài viết này...</td>
+                        <td><span class="status approved">approved</span></td>
+                        <td>comment</td>
+                        <td class="timestamp">2024-01-18 14:22:45</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">c3o4m5m6-e7n8</span></td>
+                        <td>Chào mừng đến với...</td>
+                        <td>Hoàng Văn E</td>
+                        <td>hoangvane@email.com</td>
+                        <td class="content-preview">Mong có thêm nhiều bài viết như thế này...</td>
+                        <td><span class="status pending">pending</span></td>
+                        <td>comment</td>
+                        <td class="timestamp">2024-01-19 16:30:12</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">c4o5m6m7-e8n9</span></td>
+                        <td>Hướng dẫn sử dụng...</td>
+                        <td>Vũ Thị F</td>
+                        <td>vuthif@email.com</td>
+                        <td class="content-preview">Hướng dẫn rất chi tiết và dễ hiểu...</td>
+                        <td><span class="status approved">approved</span></td>
+                        <td>comment</td>
+                        <td class="timestamp">2024-02-22 10:45:33</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">c5o6m7m8-e9n0</span></td>
+                        <td>Hướng dẫn sử dụng...</td>
+                        <td>Đỗ Văn G</td>
+                        <td>dovang@email.com</td>
+                        <td class="content-preview">Có thể bổ sung thêm ảnh minh họa không...</td>
+                        <td><span class="status approved">approved</span></td>
+                        <td>comment</td>
+                        <td class="timestamp">2024-02-23 13:20:15</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">c6o7m8m9-e0n1</span></td>
+                        <td>Hướng dẫn sử dụng...</td>
+                        <td>Bùi Thị H</td>
+                        <td>buithih@email.com</td>
+                        <td class="content-preview">Cảm ơn bạn đã chia sẻ kiến thức...</td>
+                        <td><span class="status approved">approved</span></td>
+                        <td>comment</td>
+                        <td class="timestamp">2024-02-24 08:55:22</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">c7o8m9m0-e1n2</span></td>
+                        <td>Sản phẩm A</td>
+                        <td>Spam User</td>
+                        <td>spam@spam.com</td>
+                        <td class="content-preview">BUY CHEAP PRODUCTS NOW! CLICK HERE...</td>
+                        <td><span class="status spam">spam</span></td>
+                        <td>comment</td>
+                        <td class="timestamp">2024-05-14 20:30:44</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Options Table -->
+        <div id="options" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">⚙️ Options Table</h2>
+                <span class="record-count">8 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Option Name</th>
+                        <th>Option Value</th>
+                        <th>Autoload</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">o1p2t3i4-o5n6</span></td>
+                        <td>site_title</td>
+                        <td>CMS Hiện Đại</td>
+                        <td>yes</td>
+                        <td class="timestamp">2024-01-15 10:00:00</td>
+                        <td class="timestamp">2024-01-15 10:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">o2p3t4i5-o6n7</span></td>
+                        <td>site_description</td>
+                        <td>Hệ thống quản lý nội dung WordPress-inspired</td>
+                        <td>yes</td>
+                        <td class="timestamp">2024-01-15 10:05:00</td>
+                        <td class="timestamp">2024-03-20 14:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">o3p4t5i6-o7n8</span></td>
+                        <td>admin_email</td>
+                        <td>admin@example.com</td>
+                        <td>yes</td>
+                        <td class="timestamp">2024-01-15 10:10:00</td>
+                        <td class="timestamp">2024-01-15 10:10:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">o4p5t6i7-o8n9</span></td>
+                        <td>posts_per_page</td>
+                        <td>10</td>
+                        <td>yes</td>
+                        <td class="timestamp">2024-01-15 10:15:00</td>
+                        <td class="timestamp">2024-02-10 16:20:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">o5p6t7i8-o9n0</span></td>
+                        <td>date_format</td>
+                        <td>d/m/Y</td>
+                        <td>yes</td>
+                        <td class="timestamp">2024-01-15 10:20:00</td>
+                        <td class="timestamp">2024-01-15 10:20:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">o6p7t8i9-o0n1</span></td>
+                        <td>time_format</td>
+                        <td>H:i</td>
+                        <td>yes</td>
+                        <td class="timestamp">2024-01-15 10:25:00</td>
+                        <td class="timestamp">2024-01-15 10:25:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">o7p8t9i0-o1n2</span></td>
+                        <td>default_language</td>
+                        <td>vi_VN</td>
+                        <td>yes</td>
+                        <td class="timestamp">2024-01-15 10:30:00</td>
+                        <td class="timestamp">2024-01-15 10:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">o8p9t0i1-o2n3</span></td>
+                        <td>theme_settings</td>
+                        <td class="content-preview">{"primary_color": "#667eea", "secondary_color": "#764ba2", "layout": "wide"}</td>
+                        <td>no</td>
+                        <td class="timestamp">2024-01-15 10:35:00</td>
+                        <td class="timestamp">2024-07-15 09:45:30</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Languages Table -->
+        <div id="languages" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">🌐 Languages Table</h2>
+                <span class="record-count">3 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Native Name</th>
+                        <th>Default</th>
+                        <th>Active</th>
+                        <th>Direction</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">l1a2n3g4-u5a6</span></td>
+                        <td>vi_VN</td>
+                        <td>Vietnamese</td>
+                        <td>Tiếng Việt</td>
+                        <td><span class="status active">✓</span></td>
+                        <td><span class="status active">✓</span></td>
+                        <td>ltr</td>
+                        <td class="timestamp">2024-01-15 10:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">l2a3n4g5-u6a7</span></td>
+                        <td>en_US</td>
+                        <td>English</td>
+                        <td>English</td>
+                        <td><span class="status inactive">✗</span></td>
+                        <td><span class="status active">✓</span></td>
+                        <td>ltr</td>
+                        <td class="timestamp">2024-01-15 10:05:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">l3a4n5g6-u7a8</span></td>
+                        <td>zh_CN</td>
+                        <td>Chinese</td>
+                        <td>中文</td>
+                        <td><span class="status inactive">✗</span></td>
+                        <td><span class="status active">✓</span></td>
+                        <td>ltr</td>
+                        <td class="timestamp">2024-01-15 10:10:00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- User Meta Table -->
+        <div id="user_meta" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">👤 User Meta Table</h2>
+                <span class="record-count">12 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User ID</th>
+                        <th>Meta Key</th>
+                        <th>Meta Value</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">um1e2t3a-4m5e</span></td>
+                        <td><span class="uuid">550e8400-e29b</span></td>
+                        <td>first_name</td>
+                        <td>Administrator</td>
+                        <td class="timestamp">2024-01-15 10:30:00</td>
+                        <td class="timestamp">2024-01-15 10:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">um2e3t4a-5m6e</span></td>
+                        <td><span class="uuid">550e8400-e29b</span></td>
+                        <td>last_name</td>
+                        <td>System</td>
+                        <td class="timestamp">2024-01-15 10:30:00</td>
+                        <td class="timestamp">2024-01-15 10:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">um3e4t5a-6m7e</span></td>
+                        <td><span class="uuid">550e8400-e29b</span></td>
+                        <td>phone_number</td>
+                        <td>+84 901 234 567</td>
+                        <td class="timestamp">2024-01-15 10:30:00</td>
+                        <td class="timestamp">2024-03-10 14:20:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">um4e5t6a-7m8e</span></td>
+                        <td><span class="uuid">6ba7b810-9dad</span></td>
+                        <td>first_name</td>
+                        <td>Nguyễn Văn</td>
+                        <td class="timestamp">2024-02-20 14:45:12</td>
+                        <td class="timestamp">2024-02-20 14:45:12</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">um5e6t7a-8m9e</span></td>
+                        <td><span class="uuid">6ba7b810-9dad</span></td>
+                        <td>last_name</td>
+                        <td>A</td>
+                        <td class="timestamp">2024-02-20 14:45:12</td>
+                        <td class="timestamp">2024-02-20 14:45:12</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">um6e7t8a-9m0e</span></td>
+                        <td><span class="uuid">6ba7b810-9dad</span></td>
+                        <td>bio</td>
+                        <td class="content-preview">Nhà phát triển web với 5 năm kinh nghiệm trong WordPress và CMS...</td>
+                        <td class="timestamp">2024-02-20 14:45:12</td>
+                        <td class="timestamp">2024-05-15 16:30:45</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">um7e8t9a-0m1e</span></td>
+                        <td><span class="uuid">6ba7b811-9dad</span></td>
+                        <td>first_name</td>
+                        <td>Trần Thị</td>
+                        <td class="timestamp">2024-03-10 08:20:05</td>
+                        <td class="timestamp">2024-03-10 08:20:05</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">um8e9t0a-1m2e</span></td>
+                        <td><span class="uuid">6ba7b811-9dad</span></td>
+                        <td>last_name</td>
+                        <td>B</td>
+                        <td class="timestamp">2024-03-10 08:20:05</td>
+                        <td class="timestamp">2024-03-10 08:20:05</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">um9e0t1a-2m3e</span></td>
+                        <td><span class="uuid">6ba7b811-9dad</span></td>
+                        <td>avatar_url</td>
+                        <td>https://example.com/avatars/tranthib.jpg</td>
+                        <td class="timestamp">2024-03-10 08:20:05</td>
+                        <td class="timestamp">2024-06-20 10:15:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">um0e1t2a-3m4e</span></td>
+                        <td><span class="uuid">6ba7b812-9dad</span></td>
+                        <td>role</td>
+                        <td>editor</td>
+                        <td class="timestamp">2024-04-05 12:15:30</td>
+                        <td class="timestamp">2024-04-05 12:15:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">ume2t3a4-m5e6</span></td>
+                        <td><span class="uuid">6ba7b812-9dad</span></td>
+                        <td>permissions</td>
+                        <td class="content-preview">{"can_edit_posts": true, "can_publish": true, "can_delete": false}</td>
+                        <td class="timestamp">2024-04-05 12:15:30</td>
+                        <td class="timestamp">2024-07-10 09:30:15</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">ume3t4a5-m6e7</span></td>
+                        <td><span class="uuid">6ba7b813-9dad</span></td>
+                        <td>suspension_reason</td>
+                        <td>Spam và vi phạm quy định cộng đồng</td>
+                        <td class="timestamp">2024-07-20 15:45:22</td>
+                        <td class="timestamp">2024-07-20 15:45:22</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Post Meta Table -->
+        <div id="post_meta" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">📄 Post Meta Table</h2>
+                <span class="record-count">15 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Post ID</th>
+                        <th>Meta Key</th>
+                        <th>Meta Value</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">pm1e2t3a-4p5o</span></td>
+                        <td><span class="uuid">a1b2c3d4-e5f6</span></td>
+                        <td>featured_image</td>
+                        <td>https://example.com/uploads/welcome-banner.jpg</td>
+                        <td class="timestamp">2024-01-16 11:00:00</td>
+                        <td class="timestamp">2024-01-16 11:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pm2e3t4a-5p6o</span></td>
+                        <td><span class="uuid">a1b2c3d4-e5f6</span></td>
+                        <td>seo_title</td>
+                        <td>Chào mừng đến với CMS mới - Hệ thống quản lý nội dung hiện đại</td>
+                        <td class="timestamp">2024-01-16 11:00:00</td>
+                        <td class="timestamp">2024-03-15 14:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pm3e4t5a-6p7o</span></td>
+                        <td><span class="uuid">a1b2c3d4-e5f6</span></td>
+                        <td>seo_description</td>
+                        <td>Khám phá hệ thống CMS mới với nhiều tính năng hiện đại và giao diện thân thiện</td>
+                        <td class="timestamp">2024-01-16 11:00:00</td>
+                        <td class="timestamp">2024-03-15 14:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pm4e5t6a-7p8o</span></td>
+                        <td><span class="uuid">b2c3d4e5-f6g7</span></td>
+                        <td>difficulty_level</td>
+                        <td>beginner</td>
+                        <td class="timestamp">2024-02-21 09:30:15</td>
+                        <td class="timestamp">2024-02-21 09:30:15</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pm5e6t7a-8p9o</span></td>
+                        <td><span class="uuid">b2c3d4e5-f6g7</span></td>
+                        <td>reading_time</td>
+                        <td>8 phút</td>
+                        <td class="timestamp">2024-02-21 09:30:15</td>
+                        <td class="timestamp">2024-02-21 09:30:15</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pm6e7t8a-9p0o</span></td>
+                        <td><span class="uuid">c3d4e5f6-g7h8</span></td>
+                        <td>page_template</td>
+                        <td>about-page</td>
+                        <td class="timestamp">2024-03-11 14:20:30</td>
+                        <td class="timestamp">2024-03-11 14:20:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pm7e8t9a-0p1o</span></td>
+                        <td><span class="uuid">e5f6g7h8-i9j0</span></td>
+                        <td>product_price</td>
+                        <td>1500000</td>
+                        <td class="timestamp">2024-05-13 10:15:45</td>
+                        <td class="timestamp">2024-07-20 16:30:22</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pm8e9t0a-1p2o</span></td>
+                        <td><span class="uuid">e5f6g7h8-i9j0</span></td>
+                        <td>product_sku</td>
+                        <td>PRD-A-001</td>
+                        <td class="timestamp">2024-05-13 10:15:45</td>
+                        <td class="timestamp">2024-05-13 10:15:45</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pm9e0t1a-2p3o</span></td>
+                        <td><span class="uuid">e5f6g7h8-i9j0</span></td>
+                        <td>product_stock</td>
+                        <td>25</td>
+                        <td class="timestamp">2024-05-13 10:15:45</td>
+                        <td class="timestamp">2024-08-01 09:15:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pm0e1t2a-3p4o</span></td>
+                        <td><span class="uuid">f6g7h8i9-j0k1</span></td>
+                        <td>file_size</td>
+                        <td>2048576</td>
+                        <td class="timestamp">2024-06-20 13:30:12</td>
+                        <td class="timestamp">2024-06-20 13:30:12</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pme2t3a4-p5o6</span></td>
+                        <td><span class="uuid">f6g7h8i9-j0k1</span></td>
+                        <td>image_dimensions</td>
+                        <td>1920x1080</td>
+                        <td class="timestamp">2024-06-20 13:30:12</td>
+                        <td class="timestamp">2024-06-20 13:30:12</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pme3t4a5-p6o7</span></td>
+                        <td><span class="uuid">f6g7h8i9-j0k1</span></td>
+                        <td>alt_text</td>
+                        <td>Banner trang chủ với logo công ty và slogan</td>
+                        <td class="timestamp">2024-06-20 13:30:12</td>
+                        <td class="timestamp">2024-06-20 13:30:12</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pme4t5a6-p7o8</span></td>
+                        <td><span class="uuid">g7h8i9j0-k1l2</span></td>
+                        <td>contact_form_id</td>
+                        <td>contact-form-1</td>
+                        <td class="timestamp">2024-07-25 08:45:33</td>
+                        <td class="timestamp">2024-07-25 08:45:33</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pme5t6a7-p8o9</span></td>
+                        <td><span class="uuid">h8i9j0k1-l2m3</span></td>
+                        <td>menu_position</td>
+                        <td>1</td>
+                        <td class="timestamp">2024-08-01 12:00:00</td>
+                        <td class="timestamp">2024-08-01 12:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">pme6t7a8-p9o0</span></td>
+                        <td><span class="uuid">h8i9j0k1-l2m3</span></td>
+                        <td>menu_icon</td>
+                        <td>fas fa-home</td>
+                        <td class="timestamp">2024-08-01 12:00:00</td>
+                        <td class="timestamp">2024-08-01 12:00:00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Term Taxonomy Table -->
+        <div id="term_taxonomy" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">📊 Term Taxonomy Table</h2>
+                <span class="record-count">6 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Term ID</th>
+                        <th>Taxonomy</th>
+                        <th>Description</th>
+                        <th>Parent ID</th>
+                        <th>Count</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">tt1a2x3o-n4o5</span></td>
+                        <td><span class="uuid">t1e2r3m4-s5a6</span></td>
+                        <td>category</td>
+                        <td>Các bài viết về công nghệ và phát triển</td>
+                        <td>-</td>
+                        <td>2</td>
+                        <td class="timestamp">2024-01-16 11:30:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tt2a3x4o-n5o6</span></td>
+                        <td><span class="uuid">t2e3r4m5-s6a7</span></td>
+                        <td>category</td>
+                        <td>Tin tức và cập nhật mới nhất</td>
+                        <td>-</td>
+                        <td>1</td>
+                        <td class="timestamp">2024-01-16 11:35:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tt3a4x5o-n6o7</span></td>
+                        <td><span class="uuid">t3e4r5m6-s7a8</span></td>
+                        <td>category</td>
+                        <td>Hướng dẫn sử dụng và tutorial</td>
+                        <td>-</td>
+                        <td>1</td>
+                        <td class="timestamp">2024-02-21 10:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tt4a5x6o-n7o8</span></td>
+                        <td><span class="uuid">t4e5r6m7-s8a9</span></td>
+                        <td>product_cat</td>
+                        <td>Danh mục sản phẩm chính</td>
+                        <td>-</td>
+                        <td>1</td>
+                        <td class="timestamp">2024-03-11 15:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tt5a6x7o-n8o9</span></td>
+                        <td><span class="uuid">t5e6r7m8-s9a0</span></td>
+                        <td>post_tag</td>
+                        <td>Tag cho các bài viết liên quan đến WordPress</td>
+                        <td>-</td>
+                        <td>2</td>
+                        <td class="timestamp">2024-04-06 17:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">tt6a7x8o-n9o0</span></td>
+                        <td><span class="uuid">t6e7r8m9-s0a1</span></td>
+                        <td>post_tag</td>
+                        <td>Tag cho các bài viết về hệ thống CMS</td>
+                        <td>-</td>
+                        <td>2</td>
+                        <td class="timestamp">2024-05-13 11:00:00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Term Relationships Table -->
+        <div id="term_relationships" class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">🔗 Term Relationships Table</h2>
+                <span class="record-count">8 records</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Object ID</th>
+                        <th>Term Taxonomy ID</th>
+                        <th>Term Order</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="uuid">a1b2c3d4-e5f6</span></td>
+                        <td><span class="uuid">tt2a3x4o-n5o6</span></td>
+                        <td>0</td>
+                        <td class="timestamp">2024-01-16 11:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">a1b2c3d4-e5f6</span></td>
+                        <td><span class="uuid">tt6a7x8o-n9o0</span></td>
+                        <td>1</td>
+                        <td class="timestamp">2024-01-16 11:00:00</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">b2c3d4e5-f6g7</span></td>
+                        <td><span class="uuid">tt3a4x5o-n6o7</span></td>
+                        <td>0</td>
+                        <td class="timestamp">2024-02-21 09:30:15</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">b2c3d4e5-f6g7</span></td>
+                        <td><span class="uuid">tt6a7x8o-n9o0</span></td>
+                        <td>1</td>
+                        <td class="timestamp">2024-02-21 09:30:15</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">b2c3d4e5-f6g7</span></td>
+                        <td><span class="uuid">tt5a6x7o-n8o9</span></td>
+                        <td>2</td>
+                        <td class="timestamp">2024-02-21 09:30:15</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">d4e5f6g7-h8i9</span></td>
+                        <td><span class="uuid">tt1a2x3o-n4o5</span></td>
+                        <td>0</td>
+                        <td class="timestamp">2024-04-06 16:45:22</td>
+                    </tr>
+                    <tr>
+                        <td><span class="uuid">
+                

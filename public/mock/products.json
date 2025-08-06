@@ -1,0 +1,154 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Yến Sào Nguyên Tổ",
+      "description": "Yến sào nguyên tổ cao cấp, giữ nguyên hình dạng tự nhiên",
+      "price": "2.500.000đ",
+      "originalPrice": "3.500.000đ",
+      "weight": "100g",
+      "moisture": 15,
+      "storage": 24,
+      "image": "/images/products/1.jpg",
+      "badge": "Bán chạy nhất",
+      "badgeColor": "from-red-500 to-pink-500"
+    },
+    {
+      "id": 2,
+      "name": "Yến Sào Chưng Sẵn",
+      "description": "Yến sào đã chế biến sẵn, tiện lợi sử dụng ngay",
+      "price": "1.800.000đ",
+      "originalPrice": "2.200.000đ",
+      "weight": "6 lọ x 70ml",
+      "moisture": 12,
+      "storage": 18,
+      "image": "/images/products/2.jpg",
+      "badge": "Tiện lợi",
+      "badgeColor": "from-blue-500 to-cyan-500"
+    },
+    {
+      "id": 3,
+      "name": "Bột Yến Sào Nguyên Chất",
+      "description": "Bột yến sào tinh khiết, dễ hấp thụ và sử dụng",
+      "price": "1.200.000đ",
+      "originalPrice": "1.500.000đ",
+      "weight": "50g",
+      "moisture": 10,
+      "storage": 12,
+      "image": "/images/products/3.jpg",
+      "badge": "Mới",
+      "badgeColor": "from-green-500 to-emerald-500"
+    },
+    {
+      "id": 4,
+      "name": "Combo Yến Sào Gia Đình",
+      "description": "Bộ sản phẩm yến sào đa dạng cho cả gia đình",
+      "price": "3.500.000đ",
+      "originalPrice": "4.200.000đ",
+      "weight": "200g",
+      "moisture": 15,
+      "storage": 24,
+      "image": "/images/products/4.jpg",
+      "badge": "Khuyến mãi",
+      "badgeColor": "from-purple-500 to-pink-500"
+    },
+    {
+      "id": 5,
+      "name": "Yến Sào Hồng Táo",
+      "description": "Yến sào kết hợp hồng táo, bổ dưỡng cho phụ nữ",
+      "price": "2.800.000đ",
+      "originalPrice": "3.300.000đ",
+      "weight": "120g",
+      "moisture": 14,
+      "storage": 20,
+      "image": "/images/products/5.jpg",
+      "badge": "Đặc biệt",
+      "badgeColor": "from-orange-500 to-red-500"
+    },
+    {
+      "id": 6,
+      "name": "Yến Sào Đường Phèn",
+      "description": "Yến sào chưng đường phèn, ngọt tự nhiên",
+      "price": "2.200.000đ",
+      "originalPrice": "2.600.000đ",
+      "weight": "150g",
+      "moisture": 13,
+      "storage": 22,
+      "image": "/images/products/6.png",
+      "badge": "Phổ biến",
+      "badgeColor": "from-yellow-500 to-orange-500"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": 1,
+      "name": "Chị Minh Anh",
+      "location": "Hà Nội",
+      "avatar": "/images/avatars/1.jpg",
+      "rating": 5,
+      "comment": "Sử dụng yến sào Golden Nest được 3 tháng, da tôi mịn màng hơn hẳn. Chất lượng sản phẩm rất tốt, giao hàng nhanh chóng."
+    },
+    {
+      "id": 2,
+      "name": "Anh Tuấn",
+      "location": "TP.HCM",
+      "avatar": "/images/avatars/2.jpg",
+      "rating": 5,
+      "comment": "Mua yến sào cho mẹ già, sau khi dùng bà khỏe hơn nhiều, ít ho và ngủ ngon hơn. Sẽ tiếp tục ủng hộ shop!"
+    },
+    {
+      "id": 3,
+      "name": "Chị Thu Hà",
+      "location": "Đà Nẵng",
+      "avatar": "/images/avatars/3.jpg",
+      "rating": 5,
+      "comment": "Yến sào chưng sẵn rất tiện lợi, vị ngọt tự nhiên. Con tôi uống rất thích, sức khỏe cải thiện rõ rệt."
+    }
+  ],
+  "features": [
+    {
+      "id": 1,
+      "title": "100% Thiên Nhiên",
+      "description": "Yến sào được thu hoạch từ những hang động tự nhiên, không chất bảo quản",
+      "icon": "Shield"
+    },
+    {
+      "id": 2,
+      "title": "Chứng Nhận Chất Lượng",
+      "description": "Được kiểm định bởi các tổ chức uy tín, đảm bảo tiêu chuẩn xuất khẩu",
+      "icon": "Award"
+    },
+    {
+      "id": 3,
+      "title": "Giao Hàng Nhanh",
+      "description": "Giao hàng toàn quốc trong 24h, đóng gói cẩn thận, bảo quản lạnh",
+      "icon": "Truck"
+    },
+    {
+      "id": 4,
+      "title": "Tư Vấn Chuyên Nghiệp",
+      "description": "Đội ngũ chuyên gia dinh dưỡng tư vấn cách sử dụng hiệu quả nhất",
+      "icon": "Heart"
+    }
+  ],
+  "benefits": [
+    {
+      "id": 1,
+      "title": "Làm đẹp da từ bên trong",
+      "description": "Collagen và acid amin trong yến sào giúp da mịn màng, săn chắc và chống lão hóa hiệu quả",
+      "icon": "Sparkles"
+    },
+    {
+      "id": 2,
+      "title": "Tăng cường sức đề kháng",
+      "description": "Protein và khoáng chất giúp tăng cường hệ miễn dịch, chống lại bệnh tật và mệt mỏi",
+      "icon": "Heart"
+    },
+    {
+      "id": 3,
+      "title": "Bổ phổi, dưỡng thận",
+      "description": "Theo Đông y, yến sào có tác dụng bổ phổi, dưỡng thận, tăng cường sinh lực",
+      "icon": "Shield"
+    }
+  ]
+} 
